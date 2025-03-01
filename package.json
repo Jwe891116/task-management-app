@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "description": "Create a task management app ",
   "main": "app.js",
+  "type": "module",
   "scripts": {
+    "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jwe891116/task-management-app.git"
   },
   "author": "Joshua Emmanuel",
   "license": "ISC",
