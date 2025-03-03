@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management App</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Task Management App</h1>
+    <form action="/add-task" method="POST">
+        <input type="text" name="title" placeholder="Task title" required>
+        <textarea name="description" placeholder="Task description"></textarea>
+        <button type="submit">Add Task</button>
+    </form>
+
+    <ul class = "row">
+        <% tasks.forEach(task => { %>
+            <li class="<%= task.completed ? 'completed' : '' %>">
+                <strong><%= task.title %></strong>
+                <p><%= task.description %></p>
+                <form action="/toggle-task/<%= task.id %>" method="POST" style="display: inline;">
+                    <button type="submit"><%= task.completed ? 'Undo' : 'Complete' %></button>
+                </form>
+                <form action="/delete-task/<%= task.id %>" method="POST" style="display: inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </li>
+        <% }) %>
+    </ul>
+</body>
+</html>
