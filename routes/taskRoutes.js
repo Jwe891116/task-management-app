@@ -8,13 +8,7 @@ const router = express.Router();
 import path from "path";
 
 // Initialize an empty array to store tasks
-let tasks = [
-    {id: 1, title: "Task 1", description: "Description for Task 1", completed: true, priority: "Medium"},
-    {id: 2, title: "Task 2", description: "Description for Task 2", completed: false, priority: "High"},
-    {id: 3, title: "Task 3", description: "Description for Task 3", completed: true, priority: "Low"},
-    {id: 4, title: "Task 4", description: "Description for Task 4", completed: false, priority: "High"},
-    {id: 5, title: "Task 5", description: "Description for Task 5", completed: false, priority: "Medium"},
-];
+let tasks = [];
 
 // Initialize a counter to assign unique IDs to tasks
 let idCounter = 1;
