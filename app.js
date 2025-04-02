@@ -2,6 +2,7 @@
 import express from "express"; // Import express framework
 import taskRoutes from "./routes/taskRoutes.js"; // Import task routes
 import path from "path"; // Import path module
+import { pool } from "./config/db.js";
 
 // Create an instance of the Express application
 const app = express();
