@@ -3,6 +3,7 @@ import express from "express"; // Import express framework
 import taskRoutes from "./routes/taskRoutes.js"; // Import task routes
 import path from "path"; // Import path module
 import { pool } from "./config/db.js";
+import methodOverride from "method-override";
 
 // Create an instance of the Express application
 const app = express();
@@ -12,6 +13,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the public directory
 app.use(express.static(path.join(process.cwd(), "public")));
+
+app.use(methodOverride('_method', { 
+  methods: ['POST', 'GET']  // Ensures it works with HTML form overrides
+}));
 
 // Set the view engine to EJS 
 app.set("view engine", "ejs");
@@ -38,7 +43,7 @@ app.use((req, res) => {
 });
 
 // Define the port on which the server will listen
-const PORT = 3001;
+const PORT = 3000;
 
 // Start the server and listen on the specified port
 app.listen(PORT, () => {

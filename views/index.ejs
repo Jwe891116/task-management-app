@@ -9,72 +9,52 @@
 <body>
     <h1>Task Management App</h1>
 
-    <!-- Search Form -->
-     <div class="row">
-    <form action="/search" method="GET">
-        <input type="text" name="query" placeholder="Search tasks by title or description">
-        <button type="submit">Search</button>
-    </form>
+    <!-- Error display section -->
+    <% if (errors && errors.length > 0) { %>
+        <div class="error-container">
+            <h3>Please fix the following errors:</h3>
+            <ul class="error-list">
+                <% errors.forEach(error => { %>
+                    <li class="error-item"><%= error %></li>
+                <% }); %>
+            </ul>
+        </div>
+    <% } %>
 
-    <!-- Filters -->
-     <div>
-        <h1>Filters</h1>
-        <form action="/filter-tasks" method="GET" style="display: inline;">
-        <input type="hidden" name="filter" value="all">
-        <button type="submit">All</button>
-    </form>
-    <form action="/filter-tasks" method="GET" style="display: inline;">
-        <input type="hidden" name="filter" value="completed">
-        <button type="submit">Completed</button>
-    </form>
-    <form action="/filter-tasks" method="GET" style="display: inline;">
-        <input type="hidden" name="filter" value="incomplete">
-        <button type="submit">Incomplete</button>
-    </form>
-</div>
-    
-    <!-- Add task -->
-    <form action="/add-task" method="POST">
-        <input type="text" name="title" placeholder="Task title" required>
-        <textarea name="description" placeholder="Task description" required></textarea>
-        <select name="priority" required>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-        </select>
+    <!-- Add task form -->
+    <form action="/tasks" method="POST">
+        <input type="text" name="title" placeholder="Task title (3-100 characters)" 
+               value="<%= (locals.title || '') %>" required>
+        
+        <textarea name="description" placeholder="Task description (optional, max 500 characters)"><%= (locals.description || '') %></textarea>
+
         <button type="submit">Add Task</button>
     </form>
 
-    <!-- Sort task by priority or title -->
-    <form action="/sort-tasks" method="GET">
-        <label for="sort">Sort by:</label>
-        <select name="sort" id="sort">
-            <option value="priority">Priority</option>
-            <option value="title">Title</option>
-        </select>
-        <button type="submit">Sort</button>
-    </form>
-     </div>
-     
-     <!-- Task display -->
-     <% if (tasks.length === 0) { %>
+    <!-- Task display -->
+    <% if (tasks.length === 0) { %>
         <p>No tasks found.</p>
     <% } else { %>
-        <ul class="row">
+        <ul>
             <% tasks.forEach(task => { %>
                 <li class="<%= task.completed ? 'completed' : '' %>">
                     <strong><%= task.title %></strong>
                     <p><%= task.description %></p>
-                    <p>Priority: <%= task.priority %></p>
-                    <form action="/toggle-task/<%= task.id %>" method="POST" style="display: inline;">
-                        <button type="submit"><%= task.completed ? 'Undo' : 'Complete' %></button>
-                    </form>
-                    <form action="/delete-task/<%= task.id %>" method="POST" style="display: inline;">
-                        <button type="submit">Delete</button>
-                    </form>
+                    <p>Created: <%= new Date(task.created_at).toLocaleString() %></p>
+                    <p>Status: <%= task.completed ? 'Completed' : 'Incomplete' %></p>
+                    <div class="task-actions">
+                        <!-- Toggle completion status -->
+                        <form action="/tasks/<%= task.id %>?_method=PATCH" method="POST">
+                            <button type="submit"><%= task.completed ? 'Mark Incomplete' : 'Mark Complete' %></button>
+                        </form>
+                        <!-- Delete task -->
+                        <form action="/tasks/<%= task.id %>?_method=DELETE" method="POST">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
                 </li>
             <% }) %>
         </ul>
     <% } %>
-    
+</body>
 </html>
