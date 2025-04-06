@@ -9,52 +9,100 @@
 <body>
     <h1>Task Management App</h1>
 
+    <!-- Search and filter section -->
+    <div class="filters">
+        <form method="GET" action="/">
+            <input type="text" name="search" placeholder="Search tasks..." value="<%= searchTerm %>">
+            <br> 
+            <div class="select-group"> <select name="filter">
+                <option value="all" <%= currentFilter === 'all' ? 'selected' : '' %>>All Tasks</option>
+                <option value="completed" <%= currentFilter === 'completed' ? 'selected' : '' %>>Completed</option>
+                <option value="incomplete" <%= currentFilter === 'incomplete' ? 'selected' : '' %>>Incomplete</option>
+            </select>
+            <select name="priority">
+                <option value="all" <%= currentPriority === 'all' ? 'selected' : '' %>>All Priorities</option>
+                <option value="High" <%= currentPriority === 'High' ? 'selected' : '' %>>High</option>
+                <option value="Medium" <%= currentPriority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                <option value="Low" <%= currentPriority === 'Low' ? 'selected' : '' %>>Low</option>
+            </select>
+        </div>
+            <button type="submit">Apply Filters</button>
+        </form>
+    </div>
+
     <!-- Error display section -->
     <% if (errors && errors.length > 0) { %>
-        <div class="error-container">
-            <h3>Please fix the following errors:</h3>
-            <ul class="error-list">
-                <% errors.forEach(error => { %>
-                    <li class="error-item"><%= error %></li>
-                <% }); %>
-            </ul>
-        </div>
+    <div class="error-container">
+        <h3>Please fix the following errors:</h3>
+        <ul class="error-list">
+            <% errors.forEach(error => { %>
+            <li class="error-item"><%= error %></li>
+            <% }); %>
+        </ul>
+    </div>
     <% } %>
 
     <!-- Add task form -->
     <form action="/tasks" method="POST">
-        <input type="text" name="title" placeholder="Task title (3-100 characters)" 
-               value="<%= (locals.title || '') %>" required>
-        
+        <input type="text" name="title" placeholder="Task title (3-100 characters)"
+            value="<%= (locals.title || '') %>" required>
         <textarea name="description" placeholder="Task description (optional, max 500 characters)"><%= (locals.description || '') %></textarea>
-
+        <select name="priority" required>
+            <option value="High">High Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="Low" selected>Low Priority</option>
+        </select>
         <button type="submit">Add Task</button>
     </form>
 
     <!-- Task display -->
     <% if (tasks.length === 0) { %>
-        <p>No tasks found.</p>
+    <p>No tasks found.</p>
     <% } else { %>
-        <ul>
-            <% tasks.forEach(task => { %>
-                <li class="<%= task.completed ? 'completed' : '' %>">
-                    <strong><%= task.title %></strong>
-                    <p><%= task.description %></p>
-                    <p>Created: <%= new Date(task.created_at).toLocaleString() %></p>
-                    <p>Status: <%= task.completed ? 'Completed' : 'Incomplete' %></p>
-                    <div class="task-actions">
-                        <!-- Toggle completion status -->
-                        <form action="/tasks/<%= task.id %>?_method=PATCH" method="POST">
-                            <button type="submit"><%= task.completed ? 'Mark Incomplete' : 'Mark Complete' %></button>
-                        </form>
-                        <!-- Delete task -->
-                        <form action="/tasks/<%= task.id %>?_method=DELETE" method="POST">
-                            <button type="submit">Delete</button>
-                        </form>
-                    </div>
-                </li>
-            <% }) %>
-        </ul>
+    <ul>
+        <% tasks.forEach(task => { %>
+        <li class="<%= task.completed ? 'completed' : '' %> priority-<%= task.priority.toLowerCase() %>">
+            <strong><%= task.title %></strong>
+            <p><%= task.description %></p>
+            <p>Priority: <%= task.priority %></p>
+            <p>Created: <%= new Date(task.created_at).toLocaleString() %></p>
+            <p>Status: <%= task.completed ? 'Completed' : 'Incomplete' %></p>
+            <div class="task-actions">
+                <!-- Toggle completion status -->
+                <form action="/tasks/<%= task.id %>?_method=PATCH" method="POST">
+                    <button type="submit"><%= task.completed ? 'Mark Incomplete' : 'Mark Complete' %></button>
+                </form>
+                <!-- Delete task -->
+                <form action="/tasks/<%= task.id %>?_method=DELETE" method="POST">
+                    <button type="submit">Delete</button>
+                </form>
+                <!-- Edit task -->
+                <form action="/tasks/<%= task.id %>/edit" method="GET">
+                    <button type="submit">Edit</button>
+                </form>
+            </div>
+        </li>
+        <% }) %>
+    </ul>
+
+    <!-- Pagination controls -->
+    <div class="pagination">
+        <% if (hasPreviousPage) { %>
+            <a href="/?page=<%= currentPage - 1 %><%= searchTerm ? `&search=${searchTerm}` : '' %><%= currentFilter !== 'all' ? `&filter=${currentFilter}` : '' %><%= currentPriority !== 'all' ? `&priority=${currentPriority}` : '' %>">&laquo; Previous</a>
+        <% } %>
+        
+        <% for (let i = 1; i <= totalPages; i++) { %>
+            <% if (i === currentPage) { %>
+                <a class="active" href="#"><%= i %></a>
+            <% } else { %>
+                <a href="/?page=<%= i %><%= searchTerm ? `&search=${searchTerm}` : '' %><%= currentFilter !== 'all' ? `&filter=${currentFilter}` : '' %><%= currentPriority !== 'all' ? `&priority=${currentPriority}` : '' %>"><%= i %></a>
+            <% } %>
+        <% } %>
+        
+        <% if (hasNextPage) { %>
+            <a href="/?page=<%= currentPage + 1 %><%= searchTerm ? `&search=${searchTerm}` : '' %><%= currentFilter !== 'all' ? `&filter=${currentFilter}` : '' %><%= currentPriority !== 'all' ? `&priority=${currentPriority}` : '' %>">Next &raquo;</a>
+        <% } %>
+    </div>
     <% } %>
 </body>
 </html>
