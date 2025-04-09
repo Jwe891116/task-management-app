@@ -110,3 +110,8 @@ body {
   margin-top: -8px;
   margin-bottom: 10px;
 }
+
+.submitted input:invalid{
+  outline: 2px solid #d32f2f;
+  border-radius: 3px;
+}

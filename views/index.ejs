@@ -22,12 +22,13 @@
     <% } %>
 
     <!-- Add task form -->
-    <form action="/tasks" method="POST">
-        <input type="text" name="title" placeholder="Task title (3-100 characters)" 
-               value="<%= (locals.title || '') %>" required>
-        
-        <textarea name="description" placeholder="Task description (optional, max 500 characters)"><%= (locals.description || '') %></textarea>
-
+    <form action="/tasks" method="POST" class="<%= (errors && errors.length > 0) ? 'submitted' : '' %>">
+        <input type="text" name="title" placeholder="Task title (3-100 characters)"
+               value="<%= title || '' %>" required
+               minlength="3" maxlength="100">
+        <input type="text" name="description" placeholder="Task description (max 500 characters)"
+                value="<%= description || '' %>" required
+                  maxlength="500">
         <button type="submit">Add Task</button>
     </form>
 

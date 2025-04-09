@@ -6,41 +6,53 @@ import {
     modifyTask
   } from "../models/userModel.js";
   
-  // Get all tasks
-  export const getAllTasks = async (req, res) => {
-    try {
+// Get all tasks
+export const getAllTasks = async (req, res) => {
+  try {
       const tasks = await fetchAllTasks();
-      res.render('index', { tasks, errors: null });
-    } catch (err) {
+      
+      // Handle errors from query params
+      const errors = req.query.errors 
+          ? (Array.isArray(req.query.errors) 
+              ? req.query.errors 
+              : [req.query.errors])
+          : null;
+
+      res.render('index', { 
+          tasks,
+          errors,
+          title: req.query.title || '',
+          description: req.query.description || ''
+      });
+  } catch (err) {
       console.error("Error fetching tasks:", err);
       res.status(500).send("Server Error");
-    }
-  };
+  }
+};
   
-  // Add new task
-  export const addTask = async (req, res) => {
-    const { title, description } = req.body;
-    const errors = validateTaskInput(title, description);
-  
-    if (errors.length > 0) {
-      try {
-        const tasks = await fetchAllTasks();
-        return res.render('index', { tasks, errors });
-      } catch (err) {
-        console.error("Error fetching tasks:", err);
-        return res.status(500).send("Server Error");
-      }
-    }
-  
-    try {
+// Add new task
+export const addTask = async (req, res) => {
+  const { title, description } = req.body;
+  const errors = validateTaskInput(title, description);
+
+  if (errors.length > 0) {
+      // Redirect to root with error and form data as query params
+      const queryParams = new URLSearchParams();
+      errors.forEach(e => queryParams.append('errors', e));
+      queryParams.set('title', title);
+      if (description) queryParams.set('description', description);
+      return res.redirect(`/?${queryParams.toString()}`);
+  }
+
+  try {
       await createTask(title, description);
       res.redirect('/');
-    } catch (err) {
+  } catch (err) {
       console.error("Error adding task:", err);
       res.status(500).send("Server Error");
-    }
-  };
-  
+  }
+};
+
   // Toggle task completion status
   export const toggleTaskCompletion = async (req, res) => {
     const taskId = parseInt(req.params.id);
@@ -67,30 +79,25 @@ import {
     }
   };
   
-  // Update task (title and description)
-  export const updateTask = async (req, res) => {
-    const taskId = parseInt(req.params.id);
-    const { title, description } = req.body;
-    const errors = validateTaskInput(title, description);
-  
-    if (errors.length > 0) {
-      try {
-        const tasks = await fetchAllTasks();
-        return res.render('index', { tasks, errors });
-      } catch (err) {
-        console.error("Error fetching tasks:", err);
-        return res.status(500).send("Server Error");
-      }
-    }
-  
-    try {
+// Update task (title and description)
+export const updateTask = async (req, res) => {
+  const taskId = parseInt(req.params.id);
+  const { title, description } = req.body;
+  const errors = validateTaskInput(title, description);
+
+  if (errors.length > 0) {
+      const errorQuery = errors.map(e => encodeURIComponent(e)).join('&errors=');
+      return res.redirect(`/?errors=${errorQuery}&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description || '')}`);
+  }
+
+  try {
       await modifyTask(taskId, title, description);
       res.redirect('/');
-    } catch (err) {
+  } catch (err) {
       console.error("Error updating task:", err);
       res.status(500).send("Server Error");
-    }
-  };
+  }
+};
   
   // Helper function for input validation
   function validateTaskInput(title, description) {
