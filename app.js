@@ -1,51 +1,49 @@
 // Import necessary modules
-import express from "express"; // Import express framework
-import taskRoutes from "./routes/taskRoutes.js"; // Import task routes
-import path from "path"; // Import path module
-import { pool } from "./config/db.js";
-import methodOverride from "method-override";
+import express from "express";                    // Express framework for building the server
+import taskRoutes from "./routes/taskRoutes.js";  // Custom routes for task-related endpoints
+import path from "path";                          // Path module for working with file and directory paths
+import { pool } from "./config/db.js";            // Database connection pool
+import methodOverride from "method-override";     // Middleware for HTTP method overriding
 
-// Create an instance of the Express application
+// Initialize Express application
 const app = express();
 
-// Middleware to parse incoming request bodies with URL-encoded payloads
-app.use(express.urlencoded({ extended: true }));
+// Middleware setup
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.static(path.join(process.cwd(), "public"))); // Serve static files from public directory
 
-// Serve static files from the public directory
-app.use(express.static(path.join(process.cwd(), "public")));
-
+// Method override middleware to support PUT/DELETE 
 app.use(methodOverride('_method', { 
-  methods: ['POST', 'GET']  // Ensures it works with HTML form overrides
+  methods: ['POST', 'GET'] 
 }));
 
-// Set the view engine to EJS 
-app.set("view engine", "ejs");
+// Template engine configuration
+app.set("view engine", "ejs");                       // Set EJS as the view engine
+app.set("views", path.join(process.cwd(), "views")); // Set views directory path
 
-// Directory where the views (templates) are located
-app.set("views", path.join(process.cwd(), "views"));
-
-// Custom middleware to log request details 
+/**
+ * Logging middleware
+ * Logs timestamp, HTTP method, and URL of each incoming request
+ */
 const loggingMiddleware = (req, res, next) => {
     const timestamp = new Date().toISOString(); 
     console.log(`[${timestamp}] ${req.method} ${req.url}`); 
-    next(); 
+    next(); // Pass control to the next middleware
 };
 
-// Use the logging middleware for all incoming requests
-app.use(loggingMiddleware);
+// Register middleware
+app.use(loggingMiddleware);  // Apply logging to all requests
+app.use("/", taskRoutes);    // Mount task routes at root path
 
-// Use the task routes for requests starting with "/"
-app.use("/", taskRoutes);
-
-// Middleware to handle 404 errors (when no route matches the request)
+// 404 Error handler middleware
 app.use((req, res) => {
-  res.status(404).send("404 Not Found.\n"); // Send a 404 response
+  res.status(404).send("404 Not Found.\n"); // Send response for unmatched routes
 });
 
-// Define the port on which the server will listen
-const PORT = 3001;
+// Server configuration
+const PORT = 3001; // Port number for the server to listen on
 
-// Start the server and listen on the specified port
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`); // Log the server's URL
+  console.log(`Server running at http://localhost:${PORT}/`); // Log server startup
 });
