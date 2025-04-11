@@ -1,6 +1,6 @@
 # Task Management App
 
-A full-featured web-based Task Management Application built using **Node.js**, **Express**, **PostgreSQL**, and **EJS**. This app allows users to create, read, update, delete, search, filter, sort, and paginate tasks efficiently through both a web interface and RESTful API.
+A full-featured web-based Task Management Application built using **Node.js**, **Express**, **PostgreSQL**, and **EJS**. This app allows users to create, read, update, delete, search, filter, sort, and paginate tasks efficiently.
 
 ---
 
