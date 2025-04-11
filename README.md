@@ -156,6 +156,7 @@ Connection tested and logged when the app starts.
 
 Check out the demo on YouTube:  
 https://youtu.be/CW8jWyseucU (Initial Web App)
+
 https://youtu.be/mSlDAvS43W8 (Updated Web App)
 
 ---
